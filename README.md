@@ -1,2 +1,3 @@
-# NewsTextClassification
-自然语言处理-新闻文本分类
+# NLP-新闻文本分类
+天池 零基础入门NLP-新闻文本分类
+熟悉Transformer，Bert
