@@ -112,7 +112,7 @@ class TrainingSystem:
             # random select
             train_data, val_data = split_data(observe_data, val_ratio)
 
-        tokenizer_path = os.path.join(self.project_root, "pretrained/bert-base-chinese", "vocab.txt")
+        tokenizer_path = os.path.join(self.project_root, "pretrained", "bert-base-chinese")
         tokenizer = BertTokenizer.from_pretrained(tokenizer_path)
 
         train_set = MyDataset(train_data, tokenizer, self.data_conf["observe_data"]["max_len"])
