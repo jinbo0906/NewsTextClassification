@@ -1,0 +1,11 @@
+name: BERTClass
+conf:
+  layer:
+    layer_n: 4
+    activate: "relu"
+    activate_scale_factor: 1.0
+    final_activate: "Identify"
+    norm: False
+    layer_size: [ 100, 100, 100, 100 ]
+load_checkpoint: False
+checkpoint_path: "./"

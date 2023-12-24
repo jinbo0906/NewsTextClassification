@@ -1,0 +1,7 @@
+defaults:
+  - global_conf: default
+  - data_conf: default
+  - model_conf: default
+  - run_conf: default
+  - _self_
+

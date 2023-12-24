@@ -1,0 +1,3 @@
+seed: 230811
+device: cuda
+debug: False
