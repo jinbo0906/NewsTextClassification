@@ -113,7 +113,7 @@ class TrainingSystem:
             train_data, val_data = split_data(observe_data, val_ratio)
 
         tokenizer_path = os.path.join(self.project_root, "pretrained", "bert-base-chinese")
-        tokenizer = BertTokenizer.from_pretrained(tokenizer_path)
+        tokenizer = BertTokenizer.from_pretrained(tokenizer_path, local_files_only=True)
 
         train_set = MyDataset(train_data, tokenizer, self.data_conf["observe_data"]["max_len"])
         valid_set = MyDataset(val_data, tokenizer, self.data_conf["observe_data"]["max_len"])
