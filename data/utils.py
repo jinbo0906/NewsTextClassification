@@ -16,7 +16,7 @@ def split_data(observe_data, val_ratio):
     """
 
     # 随机打乱数据
-    observe_data = observe_data.sample(frac=1, random_state=0)
+    observe_data = observe_data.sample(frac=1, random_state=42)
 
     # 计算验证集大小
     n_val = int(len(observe_data) * val_ratio)

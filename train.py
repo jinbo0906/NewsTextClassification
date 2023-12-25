@@ -93,7 +93,7 @@ class TrainingSystem:
 
         # eval data
         n_eval_sections = int(self.data_conf["observe_data"]["n_eval_sections"])
-        val_ratio = self.data_conf["observe_data"]["val_ratio"]
+        train_size = self.data_conf["observe_data"]["train_size"]
 
         if n_eval_sections == 0:
             val_type = "ratio"
@@ -103,16 +103,23 @@ class TrainingSystem:
         if val_type == "section":
             observe_data = pd.read_csv(train_data_path, sep='\t')
             test_data = pd.read_csv(test_data_path, sep='\t')
+            test_data['label'] = 0
             # random select
-            train_data, val_data = split_data(observe_data, val_ratio)
+            train_data = observe_data.sample(frac=train_size, random_state=7)
+            val_data = observe_data.drop(train_data.index).reset_index(drop=True)
+            train_data = train_data.reset_index(drop=True)
             pass
         else:
             observe_data = pd.read_csv(train_data_path, sep='\t')
             test_data = pd.read_csv(test_data_path, sep='\t')
+            test_data['label'] = 0
             # random select
-            train_data, val_data = split_data(observe_data, val_ratio)
+            train_data = observe_data.sample(frac=train_size, random_state=7)
+            val_data = observe_data.drop(train_data.index).reset_index(drop=True)
+            train_data = train_data.reset_index(drop=True)
 
         tokenizer_path = os.path.join(self.project_root, "pretrained", "bert-base-chinese")
+        # tokenizer_path = "E:/code/NewsTextClassification/pretrained/bert-base-chinese"
         tokenizer = BertTokenizer.from_pretrained(tokenizer_path, local_files_only=True)
 
         train_set = MyDataset(train_data, tokenizer, self.data_conf["observe_data"]["max_len"])
@@ -128,8 +135,8 @@ class TrainingSystem:
 
     def _model_init(self):
         self.log.info("init model...")
-        config_path = os.path.join(self.project_root, "pretrained/bert-base-chinese", "config.json")
-        pretrained_path = os.path.join(self.project_root, "pretrained/bert-base-chinese", "pytorch_model.bin")
+        config_path = os.path.join(self.project_root, "pretrained", "bert-base-chinese", "config.json")
+        pretrained_path = os.path.join(self.project_root, "pretrained", "bert-base-chinese", "pytorch_model.bin")
         self.model = get_model(self.model_conf, config_path, pretrained_path).to(self.device)
         self.log.info(self.model)
         if self.model_conf["load_checkpoint"]:
@@ -165,15 +172,15 @@ class TrainingSystem:
             self.log.info("Epoch_{} begin".format(epoch))
             train_l_sum = torch.tensor([0.0], dtype=torch.float32, device=self.device)
             train_acc_sum = torch.tensor([0.0], dtype=torch.float32, device=self.device)
-            max_t = len(self.train_loader)
-            loop_bar = tqdm(range(max_t))
-            for step in loop_bar:
+            loop_bar = tqdm(self.train_loader)
+            step = 0
+            for data in loop_bar:
                 if step % self.run_conf["train_conf"]["eval_freq"] == 0:
                     valid_acc, val_score = self.eval_loop(step)
-                ids = self.train_loader[step]['ids'].to(self.device, dtype=torch.long)
-                mask = self.train_loader[step]['mask'].to(self.device, dtype=torch.long)
-                token_type_ids = self.train_loader[step]['token_type_ids'].to(self.device, dtype=torch.long)
-                targets = self.train_loader[step]['targets'].to(self.device, dtype=torch.float)
+                ids = data['ids'].to(self.device, dtype=torch.long)
+                mask = data['mask'].to(self.device, dtype=torch.long)
+                token_type_ids = data['token_type_ids'].to(self.device, dtype=torch.long)
+                targets = data['targets'].to(self.device, dtype=torch.float)
                 targets.long()
                 self.optim.zero_grad()
                 y_hat = self.model(ids, mask, token_type_ids)
@@ -201,6 +208,7 @@ class TrainingSystem:
                     self.tensorboard_writer.add_scalar("Loss/train_Loss", loss.item(), step)
                     self.tensorboard_writer.add_scalar("Loss/train_acc", train_acc.item(), step)
                     self.tensorboard_writer.add_scalar("Loss/train_f1", train_f1, step)
+                step += 1
 
         self.eval_loop(num_epochs)
         self.log.info("train down...")
@@ -213,12 +221,10 @@ class TrainingSystem:
         is_save_model = False
         acc_sum, n = torch.tensor([0], dtype=torch.float32, device=self.device), 0
         y_pred_, y_true_ = [], []
-        max_t = len(self.valid_loader)
-        loop_bar = tqdm(range(max_t))
+        loop_bar = tqdm(self.valid_loader)
 
         with torch.no_grad():
-            for _step in loop_bar:
-                batch_data = self.valid_loader[_step]
+            for batch_data in loop_bar:
                 ids = batch_data['ids'].to(self.device, dtype=torch.long)
                 mask = batch_data['mask'].to(self.device, dtype=torch.long)
                 token_type_ids = batch_data['token_type_ids'].to(self.device, dtype=torch.long)

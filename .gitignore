@@ -163,4 +163,6 @@ outputs/
 multirun/
 tensorboard_log/
 tensorboard/
-pretained/
+pretrained/
+.ipynb_checkpoints/
+.pytest_cache/
