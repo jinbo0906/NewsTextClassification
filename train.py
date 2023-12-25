@@ -117,6 +117,10 @@ class TrainingSystem:
             train_data = observe_data.sample(frac=train_size, random_state=7)
             val_data = observe_data.drop(train_data.index).reset_index(drop=True)
             train_data = train_data.reset_index(drop=True)
+        self.log.info("full Dataset: {}".format(observe_data.shape))
+        self.log.info("train Dataset: {}".format(train_data.shape))
+        self.log.info("valid Dataset: {}".format(val_data.shape))
+        self.log.info("test Dataset: {}".format(train_data.shape))
 
         tokenizer_path = os.path.join(self.project_root, "pretrained", "bert-base-chinese")
         # tokenizer_path = "E:/code/NewsTextClassification/pretrained/bert-base-chinese"
@@ -188,11 +192,8 @@ class TrainingSystem:
                 train_l_sum += loss.float()
                 train_acc_sum += (torch.sum((torch.argmax(y_hat, dim=1) == targets))).float()
                 loss.backward()
-
                 self.optim.step()
 
-                if self.sch is not None:
-                    self.sch.step()
                 train_acc = train_acc_sum / len(self.train_loader[step])
                 train_f1 = metrics.f1_score(targets.cpu().numpy().tolist(), torch.argmax(y_hat, dim=1).cpu().numpy().tolist(), average='macro')
                 log_str = "train loss: {:.4e}  train acc: {:.4e}  train f1: {:.4e} val acc: {:.4e} val f1: {:.4e}".format(loss.item(), train_acc.item(), train_f1, valid_acc, val_score)
@@ -209,6 +210,7 @@ class TrainingSystem:
                     self.tensorboard_writer.add_scalar("Loss/train_acc", train_acc.item(), step)
                     self.tensorboard_writer.add_scalar("Loss/train_f1", train_f1, step)
                 step += 1
+            self.sch.step()
 
         self.eval_loop(num_epochs)
         self.log.info("train down...")
