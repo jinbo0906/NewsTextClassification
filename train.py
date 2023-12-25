@@ -122,7 +122,7 @@ class TrainingSystem:
         self.log.info("valid Dataset: {}".format(val_data.shape))
         self.log.info("test Dataset: {}".format(train_data.shape))
 
-        tokenizer_path = os.path.join(self.project_root, "pretrained", "bert-base-chinese")
+        tokenizer_path = os.path.join(self.project_root, "pretrained", "bert-mini")
         # tokenizer_path = "E:/code/NewsTextClassification/pretrained/bert-base-chinese"
         tokenizer = BertTokenizer.from_pretrained(tokenizer_path, local_files_only=True)
 
@@ -139,8 +139,8 @@ class TrainingSystem:
 
     def _model_init(self):
         self.log.info("init model...")
-        config_path = os.path.join(self.project_root, "pretrained", "bert-base-chinese", "config.json")
-        pretrained_path = os.path.join(self.project_root, "pretrained", "bert-base-chinese", "pytorch_model.bin")
+        config_path = os.path.join(self.project_root, "pretrained", "bert-mini", "config.json")
+        pretrained_path = os.path.join(self.project_root, "pretrained", "bert-mini", "pytorch_model.bin")
         self.model = get_model(self.model_conf, config_path, pretrained_path).to(self.device)
         self.log.info(self.model)
         if self.model_conf["load_checkpoint"]:
