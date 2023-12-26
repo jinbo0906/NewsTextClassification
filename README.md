@@ -12,6 +12,7 @@
 # Training Tasks
 
 - [ ] basic：CUDA_VISIBLE_DEVICES=4 python train.py --config-name=Basic hydra.job.chdir=True
+- [ ] basic,num_workers=16：CUDA_VISIBLE_DEVICES=4 python train.py --config-name=Basic run_conf.train_conf.num_workers=16 hydra.job.chdir=True
 
 
 # Results
