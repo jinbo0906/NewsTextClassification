@@ -16,9 +16,9 @@ from sklearn import metrics
 
 import torch
 from torch.utils.tensorboard import SummaryWriter
-from transformers import BertTokenizer, BertModel, BertConfig
+from transformers import BertTokenizer
 
-from data import split_data, MyDataset
+from data import MyDataset
 from models import get_model, model_saver
 
 
@@ -185,7 +185,7 @@ class TrainingSystem:
                 targets = data['targets'].to(self.device, dtype=torch.long)
                 # targets.long()
                 self.optim.zero_grad()
-                y_hat = self.model(ids, mask, token_type_ids)
+                y_hat = self.model(ids, mask, token_type_ids).to(self.device)
                 loss = self.observe_loss(y_hat, targets.long())
                 train_l_sum += loss.float()
                 train_acc_sum += (torch.sum((torch.argmax(y_hat, dim=1) == targets))).float()
@@ -230,7 +230,7 @@ class TrainingSystem:
                 targets = batch_data['targets'].to(self.device, dtype=torch.long)
                 # targets.long()
                 n += targets.shape[0]
-                y_hat = self.model(ids, mask, token_type_ids)
+                y_hat = self.model(ids, mask, token_type_ids).to(self.device)
 
                 y_pred_.extend(torch.argmax(y_hat, dim=1).cpu().numpy().tolist())
                 y_true_.extend(targets.cpu().numpy().tolist())
@@ -288,7 +288,7 @@ class TrainingSystem:
                 ids = data['ids'].to(self.device, dtype=torch.long)
                 mask = data['mask'].to(self.device, dtype=torch.long)
                 token_type_ids = data['token_type_ids'].to(self.device, dtype=torch.long)
-                batch_preds = list(self.model(ids, mask, token_type_ids).argmax(dim=1).cpu().numpy())
+                batch_preds = list(self.model(ids, mask, token_type_ids).to(self.device).argmax(dim=1).cpu().numpy())
                 for preds in batch_preds:
                     preds_list.append(preds)
         save_test_data_path = os.path.join(self.project_root, "dataset", "test_a_sample_submit.csv")
