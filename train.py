@@ -128,9 +128,9 @@ class TrainingSystem:
         train_set = MyDataset(train_data, tokenizer, self.data_conf["observe_data"]["max_len"])
         valid_set = MyDataset(val_data, tokenizer, self.data_conf["observe_data"]["max_len"])
         test_set = MyDataset(test_data, tokenizer, self.data_conf["observe_data"]["max_len"])
-        train_params = {'batch_size': self.run_conf["train_conf"]["train_batch_size"], 'shuffle': True}
-        valid_params = {'batch_size': self.run_conf["train_conf"]["valid_batch_size"], 'shuffle': True}
-        test_params = {'batch_size': self.run_conf["train_conf"]["test_batch_size"], 'shuffle': False}
+        train_params = {'batch_size': self.run_conf["train_conf"]["batch_size"], 'shuffle': True}
+        valid_params = {'batch_size': self.run_conf["train_conf"]["batch_size"], 'shuffle': True}
+        test_params = {'batch_size': self.run_conf["train_conf"]["batch_size"], 'shuffle': False}
 
         self.train_loader = DataLoader(train_set, **train_params)
         self.valid_loader = DataLoader(valid_set, **valid_params)

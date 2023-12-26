@@ -2,10 +2,6 @@ norm:
   time_norm: False
   max_t: 30
 observe_data:
-  sampler: UniformSampler
-  sampler_conf:
-    batch_size: 128
-    replace: False
   reweighting: NoReWeighting
   reweighting_conf: None
   n_eval_sections: 0
