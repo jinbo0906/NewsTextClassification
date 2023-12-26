@@ -1,11 +1,11 @@
 name: BERTClass
 conf:
-  layer:
-    layer_n: 4
-    activate: "relu"
-    activate_scale_factor: 1.0
-    final_activate: "Identify"
+  bert:
+#    activate: "relu"
     norm: False
     layer_size: [ 100, 100, 100, 100 ]
+    lstm_in_dim: 512
+    lstm_hid_dim: 64
+    lstm_layer_n: 1
 load_checkpoint: False
 checkpoint_path: "./"

@@ -108,7 +108,6 @@ class TrainingSystem:
             train_data = observe_data.sample(frac=train_size, random_state=7)
             val_data = observe_data.drop(train_data.index).reset_index(drop=True)
             train_data = train_data.reset_index(drop=True)
-            pass
         else:
             observe_data = pd.read_csv(train_data_path, sep='\t')
             test_data = pd.read_csv(test_data_path, sep='\t')
@@ -171,21 +170,20 @@ class TrainingSystem:
         self.log.info("begin training...")
         num_epochs = self.run_conf["train_conf"]["epoch"]
         val_score = 0.0
-
+        step_num = 0
         for epoch in range(num_epochs):
             self.log.info("Epoch_{} begin".format(epoch))
             train_l_sum = torch.tensor([0.0], dtype=torch.float32, device=self.device)
             train_acc_sum = torch.tensor([0.0], dtype=torch.float32, device=self.device)
             loop_bar = tqdm(self.train_loader)
-            step = 0
             for data in loop_bar:
-                if step % self.run_conf["train_conf"]["eval_freq"] == 0:
-                    valid_acc, val_score = self.eval_loop(step)
+                if step_num % self.run_conf["train_conf"]["eval_freq"] == 0:
+                    valid_acc, val_score = self.eval_loop(step_num)
                 ids = data['ids'].to(self.device, dtype=torch.long)
                 mask = data['mask'].to(self.device, dtype=torch.long)
                 token_type_ids = data['token_type_ids'].to(self.device, dtype=torch.long)
-                targets = data['targets'].to(self.device, dtype=torch.float)
-                targets.long()
+                targets = data['targets'].to(self.device, dtype=torch.long)
+                # targets.long()
                 self.optim.zero_grad()
                 y_hat = self.model(ids, mask, token_type_ids)
                 loss = self.observe_loss(y_hat, targets.long())
@@ -194,22 +192,21 @@ class TrainingSystem:
                 loss.backward()
                 self.optim.step()
 
-                train_acc = train_acc_sum / len(self.train_loader[step])
+                train_acc = train_acc_sum / len(self.train_loader)
                 train_f1 = metrics.f1_score(targets.cpu().numpy().tolist(), torch.argmax(y_hat, dim=1).cpu().numpy().tolist(), average='macro')
                 log_str = "train loss: {:.4e}  train acc: {:.4e}  train f1: {:.4e} val acc: {:.4e} val f1: {:.4e}".format(loss.item(), train_acc.item(), train_f1, valid_acc, val_score)
                 loop_bar.set_description(log_str)
                 loop_bar.refresh()
-                if step % self.run_conf["train_conf"]["print_frequency"]:
-                    self.log.info(f"step: {step}")
+                if step_num % self.run_conf["train_conf"]["print_frequency"]:
+                    self.log.info(f"step: {step_num}")
                     self.log.info(f"train loss: {loss.item()}")
                     self.log.info(f"train acc: {train_acc.item()}")
                     self.log.info(f"train f1: {train_f1}")
-                if step % self.run_conf["train_conf"]["log_freq"] == 0:
-                    # tensorboard
-                    self.tensorboard_writer.add_scalar("Loss/train_Loss", loss.item(), step)
-                    self.tensorboard_writer.add_scalar("Loss/train_acc", train_acc.item(), step)
-                    self.tensorboard_writer.add_scalar("Loss/train_f1", train_f1, step)
-                step += 1
+                # tensorboard
+                self.tensorboard_writer.add_scalar("Loss/train_Loss", loss.item(), step_num)
+                self.tensorboard_writer.add_scalar("Loss/train_acc", train_acc.item(), step_num)
+                self.tensorboard_writer.add_scalar("Loss/train_f1", train_f1, step_num)
+                step_num += 1
             self.sch.step()
 
         self.eval_loop(num_epochs)
@@ -230,8 +227,8 @@ class TrainingSystem:
                 ids = batch_data['ids'].to(self.device, dtype=torch.long)
                 mask = batch_data['mask'].to(self.device, dtype=torch.long)
                 token_type_ids = batch_data['token_type_ids'].to(self.device, dtype=torch.long)
-                targets = batch_data['targets'].to(self.device, dtype=torch.float)
-                targets.long()
+                targets = batch_data['targets'].to(self.device, dtype=torch.long)
+                # targets.long()
                 n += targets.shape[0]
                 y_hat = self.model(ids, mask, token_type_ids)
 
