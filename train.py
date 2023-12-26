@@ -192,7 +192,7 @@ class TrainingSystem:
                 loss.backward()
                 self.optim.step()
 
-                train_acc = train_acc_sum / len(self.train_loader)
+                train_acc = train_acc_sum / len(data['ids'])
                 train_f1 = metrics.f1_score(targets.cpu().numpy().tolist(), torch.argmax(y_hat, dim=1).cpu().numpy().tolist(), average='macro')
                 log_str = "train loss: {:.4e}  train acc: {:.4e}  train f1: {:.4e} val acc: {:.4e} val f1: {:.4e}".format(loss.item(), train_acc.item(), train_f1, valid_acc, val_score)
                 loop_bar.set_description(log_str)
