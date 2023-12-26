@@ -140,7 +140,8 @@ class TrainingSystem:
         self.log.info("init model...")
         config_path = os.path.join(self.project_root, "pretrained", "bert-mini", "config.json")
         pretrained_path = os.path.join(self.project_root, "pretrained", "bert-mini", "pytorch_model.bin")
-        self.model = get_model(self.model_conf, config_path, pretrained_path).to(self.device)
+        self.model = get_model(self.model_conf, config_path, pretrained_path)
+        self.model = self.model.to(self.device)
         self.log.info(self.model)
         if self.model_conf["load_checkpoint"]:
             self.model.load_state_dict(torch.load(os.path.join(self.project_root, self.model_conf["checkpoint_path"])))
@@ -183,9 +184,8 @@ class TrainingSystem:
                 mask = data['mask'].to(self.device, dtype=torch.long)
                 token_type_ids = data['token_type_ids'].to(self.device, dtype=torch.long)
                 targets = data['targets'].to(self.device, dtype=torch.long)
-                # targets.long()
                 self.optim.zero_grad()
-                y_hat = self.model(ids, mask, token_type_ids).to(self.device)
+                y_hat = self.model(ids, mask, token_type_ids)
                 loss = self.observe_loss(y_hat, targets.long())
                 train_l_sum += loss.float()
                 train_acc_sum += (torch.sum((torch.argmax(y_hat, dim=1) == targets))).float()
@@ -228,7 +228,6 @@ class TrainingSystem:
                 mask = batch_data['mask'].to(self.device, dtype=torch.long)
                 token_type_ids = batch_data['token_type_ids'].to(self.device, dtype=torch.long)
                 targets = batch_data['targets'].to(self.device, dtype=torch.long)
-                # targets.long()
                 n += targets.shape[0]
                 y_hat = self.model(ids, mask, token_type_ids).to(self.device)
 
@@ -288,7 +287,7 @@ class TrainingSystem:
                 ids = data['ids'].to(self.device, dtype=torch.long)
                 mask = data['mask'].to(self.device, dtype=torch.long)
                 token_type_ids = data['token_type_ids'].to(self.device, dtype=torch.long)
-                batch_preds = list(self.model(ids, mask, token_type_ids).to(self.device).argmax(dim=1).cpu().numpy())
+                batch_preds = list(self.model(ids, mask, token_type_ids).argmax(dim=1).cpu().numpy())
                 for preds in batch_preds:
                     preds_list.append(preds)
         save_test_data_path = os.path.join(self.project_root, "dataset", "test_a_sample_submit.csv")
