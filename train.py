@@ -218,7 +218,7 @@ class TrainingSystem:
         self.model.eval()
 
         is_save_model = False
-        acc_sum, n = torch.tensor([0], dtype=torch.float32, device=self.device), 0
+        n, acc_sum = 0, 0
         y_pred_, y_true_ = [], []
         loop_bar = tqdm(self.valid_loader)
 
@@ -228,13 +228,14 @@ class TrainingSystem:
                 mask = batch_data['mask'].to(self.device)
                 token_type_ids = batch_data['token_type_ids'].to(self.device)
                 targets = batch_data['targets'].to(self.device)
-                n += targets.shape[0]
+                n += len(targets)
                 y_hat = self.model(ids, mask, token_type_ids).to(self.device)
 
                 y_pred_.extend(torch.argmax(y_hat, dim=1).cpu().numpy().tolist())
                 y_true_.extend(targets.cpu().numpy().tolist())
         valid_f1 = metrics.f1_score(y_true_, y_pred_, average='macro')
-        valid_acc = acc_sum.item()/ n
+        acc_sum += sum(1 for y, t in zip(y_pred_, y_true_) if y == t)
+        valid_acc = acc_sum / n
         self.tensorboard_writer.add_scalar("Rmsd loss/val acc", valid_acc, step)
         self.tensorboard_writer.add_scalar("Dis loss/valid f1", valid_f1, step)
         self.log.info(f"val step: {step}")
@@ -252,7 +253,7 @@ class TrainingSystem:
             self.best_model_path = model_saver(
                 save_folder="./",
                 model=self.model,
-                save_name="NS",
+                save_name="Bert_lstm",
                 step=step
             )
 

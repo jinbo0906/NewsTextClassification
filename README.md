@@ -11,12 +11,11 @@
 
 # Training Tasks
 
-- [ ] basic：CUDA_VISIBLE_DEVICES=4 python train.py --config-name=Basic hydra.job.chdir=True
-- [ ] basic,num_workers=16：CUDA_VISIBLE_DEVICES=4 python train.py --config-name=Basic run_conf.train_conf.num_workers=16 hydra.job.chdir=True
+- [ ] basic,num_workers=32：CUDA_VISIBLE_DEVICES=4 python train.py --config-name=Basic run_conf.train_conf.num_workers=32 hydra.job.chdir=True
 
 
 # Results
 
-| Model | total_loss | Ob rmsd Loss | Ob dis Loss | model_path |
-|:-----:|:----------:|:------------:|:-----------:|:----------:|
-| basic |            |              |             |            |
+|        Model         | total_loss | Ob rmsd Loss | Ob dis Loss |      model_path      |
+|:--------------------:|:----------:|:------------:|:-----------:|:--------------------:|
+| basic,num_workers=32 |            |              |             | 2023-12-27/00-39-02/ |
