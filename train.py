@@ -174,10 +174,10 @@ class TrainingSystem:
         step_num = 0
         for epoch in range(num_epochs):
             self.log.info("Epoch_{} begin".format(epoch))
-            train_l_sum = torch.tensor([0.0], dtype=torch.float32, device=self.device)
-            train_acc_sum = torch.tensor([0.0], dtype=torch.float32, device=self.device)
             loop_bar = tqdm(self.train_loader)
             for data in loop_bar:
+                train_l_sum = torch.tensor([0.0], dtype=torch.float32, device=self.device)
+                train_acc_sum = torch.tensor([0.0], dtype=torch.float32, device=self.device)
                 if step_num % self.run_conf["train_conf"]["eval_freq"] == 0:
                     valid_acc, val_score = self.eval_loop(step_num)
                 ids = data['ids'].to(self.device)
