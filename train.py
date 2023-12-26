@@ -128,9 +128,9 @@ class TrainingSystem:
         train_set = MyDataset(train_data, tokenizer, self.data_conf["observe_data"]["max_len"])
         valid_set = MyDataset(val_data, tokenizer, self.data_conf["observe_data"]["max_len"])
         test_set = MyDataset(test_data, tokenizer, self.data_conf["observe_data"]["max_len"])
-        train_params = {'batch_size': self.run_conf["train_conf"]["batch_size"], 'shuffle': True}
-        valid_params = {'batch_size': self.run_conf["train_conf"]["batch_size"], 'shuffle': True}
-        test_params = {'batch_size': self.run_conf["train_conf"]["batch_size"], 'shuffle': False}
+        train_params = {'batch_size': self.run_conf["train_conf"]["batch_size"], 'shuffle': True, 'num_workers': 8, 'pin_memory': True}
+        valid_params = {'batch_size': self.run_conf["train_conf"]["batch_size"], 'shuffle': True, 'num_workers': 8, 'pin_memory': True}
+        test_params = {'batch_size': self.run_conf["train_conf"]["batch_size"], 'shuffle': False, 'num_workers': 8, 'pin_memory': True}
 
         self.train_loader = DataLoader(train_set, **train_params)
         self.valid_loader = DataLoader(valid_set, **valid_params)
@@ -180,10 +180,10 @@ class TrainingSystem:
             for data in loop_bar:
                 if step_num % self.run_conf["train_conf"]["eval_freq"] == 0:
                     valid_acc, val_score = self.eval_loop(step_num)
-                ids = data['ids'].to(self.device, dtype=torch.long)
-                mask = data['mask'].to(self.device, dtype=torch.long)
-                token_type_ids = data['token_type_ids'].to(self.device, dtype=torch.long)
-                targets = data['targets'].to(self.device, dtype=torch.long)
+                ids = data['ids'].to(self.device)
+                mask = data['mask'].to(self.device)
+                token_type_ids = data['token_type_ids'].to(self.device)
+                targets = data['targets'].to(self.device)
                 self.optim.zero_grad()
                 y_hat = self.model(ids, mask, token_type_ids)
                 loss = self.observe_loss(y_hat, targets.long())
@@ -224,10 +224,10 @@ class TrainingSystem:
 
         with torch.no_grad():
             for batch_data in loop_bar:
-                ids = batch_data['ids'].to(self.device, dtype=torch.long)
-                mask = batch_data['mask'].to(self.device, dtype=torch.long)
-                token_type_ids = batch_data['token_type_ids'].to(self.device, dtype=torch.long)
-                targets = batch_data['targets'].to(self.device, dtype=torch.long)
+                ids = batch_data['ids'].to(self.device)
+                mask = batch_data['mask'].to(self.device)
+                token_type_ids = batch_data['token_type_ids'].to(self.device)
+                targets = batch_data['targets'].to(self.device)
                 n += targets.shape[0]
                 y_hat = self.model(ids, mask, token_type_ids).to(self.device)
 
@@ -284,9 +284,9 @@ class TrainingSystem:
 
         with torch.no_grad():
             for data in tqdm(self.test_loader):
-                ids = data['ids'].to(self.device, dtype=torch.long)
-                mask = data['mask'].to(self.device, dtype=torch.long)
-                token_type_ids = data['token_type_ids'].to(self.device, dtype=torch.long)
+                ids = data['ids'].to(self.device)
+                mask = data['mask'].to(self.device)
+                token_type_ids = data['token_type_ids'].to(self.device)
                 batch_preds = list(self.model(ids, mask, token_type_ids).argmax(dim=1).cpu().numpy())
                 for preds in batch_preds:
                     preds_list.append(preds)
