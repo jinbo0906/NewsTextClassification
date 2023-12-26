@@ -20,9 +20,7 @@ loss:
 main_conf:
   run_mode: train
 train_conf:
-  train_batch_size: 128
-  valid_batch_size: 128
-  test_batch_size: 128
+  batch_size: 512
   epoch: 30
   eval_freq: 100
   log_freq: 0.0001
