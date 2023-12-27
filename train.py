@@ -206,6 +206,7 @@ class TrainingSystem:
                 self.tensorboard_writer.add_scalar("Loss/train_Loss", loss.item(), step_num)
                 self.tensorboard_writer.add_scalar("Loss/train_acc", train_acc.item(), step_num)
                 self.tensorboard_writer.add_scalar("Loss/train_f1", train_f1, step_num)
+                self.tensorboard_writer.add_scalar("learning-rate", self.optim.param_groups[0]['lr'], step_num)
                 step_num += 1
             self.sch.step()
 
