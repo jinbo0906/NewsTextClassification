@@ -101,16 +101,16 @@ class TrainingSystem:
             val_type = "section"
 
         if val_type == "section":
-            observe_data = pd.read_pickle(train_data_path, sep='\t')
-            test_data = pd.read_pickle(test_data_path, sep='\t')
+            observe_data = pd.read_pickle(train_data_path)
+            test_data = pd.read_pickle(test_data_path)
             test_data['label'] = 0
             # random select
             train_data = observe_data.sample(frac=train_size, random_state=7)
             val_data = observe_data.drop(train_data.index).reset_index(drop=True)
             train_data = train_data.reset_index(drop=True)
         else:
-            observe_data = pd.read_pickle(train_data_path, sep='\t')
-            test_data = pd.read_pickle(test_data_path, sep='\t')
+            observe_data = pd.read_pickle(train_data_path)
+            test_data = pd.read_pickle(test_data_path)
             test_data['label'] = 0
             # random select
             train_data = observe_data.sample(frac=train_size, random_state=7)
