@@ -7,5 +7,6 @@ conf:
     lstm_in_dim: 512
     lstm_hid_dim: 64
     lstm_layer_n: 1
+    dropout: 0
 load_checkpoint: False
 checkpoint_path: "./"

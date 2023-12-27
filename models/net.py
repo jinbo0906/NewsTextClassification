@@ -15,7 +15,7 @@ class BERTClass(torch.nn.Module):
         self.bilstm1 = torch.nn.LSTM(self.param["lstm_in_dim"], self.param["lstm_hid_dim"], self.param["lstm_layer_n"], bidirectional=True)
         self.l2 = torch.nn.Linear(128, 64)
         self.a1 = torch.nn.ReLU()
-        self.l3 = torch.nn.Dropout(0.3)
+        self.l3 = torch.nn.Dropout(self.param["dropout"])
         self.l4 = torch.nn.Linear(64, 14)
 
     def forward(self, ids, mask, token_type_ids):
