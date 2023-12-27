@@ -78,7 +78,7 @@ class TrainingSystem:
         # ------------
         # others
         # -------------
-        self.min_val_score = float('inf')
+        self.max_val_score = 0
         self.best_model_path = None
         self.model_save_queue = queue.Queue(maxsize=5)
 
@@ -128,9 +128,9 @@ class TrainingSystem:
         train_set = MyDataset(train_data, tokenizer, self.data_conf["observe_data"]["max_len"])
         valid_set = MyDataset(val_data, tokenizer, self.data_conf["observe_data"]["max_len"])
         test_set = MyDataset(test_data, tokenizer, self.data_conf["observe_data"]["max_len"])
-        train_params = {'batch_size': self.run_conf["train_conf"]["batch_size"], 'shuffle': True, 'num_workers': self.run_conf["train_conf"]["num_workers"], 'pin_memory': True}
-        valid_params = {'batch_size': self.run_conf["train_conf"]["batch_size"], 'shuffle': True, 'num_workers': self.run_conf["train_conf"]["num_workers"], 'pin_memory': True}
-        test_params = {'batch_size': self.run_conf["train_conf"]["batch_size"], 'shuffle': False, 'num_workers': self.run_conf["train_conf"]["num_workers"], 'pin_memory': True}
+        train_params = {'batch_size': self.run_conf["train_conf"]["train_batch_size"], 'shuffle': True, 'num_workers': self.run_conf["train_conf"]["num_workers"], 'pin_memory': True}
+        valid_params = {'batch_size': self.run_conf["train_conf"]["val_train_size"], 'shuffle': True, 'num_workers': self.run_conf["train_conf"]["num_workers"], 'pin_memory': True}
+        test_params = {'batch_size': self.run_conf["train_conf"]["val_train_size"], 'shuffle': False, 'num_workers': self.run_conf["train_conf"]["num_workers"], 'pin_memory': True}
 
         self.train_loader = DataLoader(train_set, **train_params)
         self.valid_loader = DataLoader(valid_set, **valid_params)
@@ -209,7 +209,7 @@ class TrainingSystem:
                 step_num += 1
             self.sch.step()
 
-        self.eval_loop(num_epochs)
+        self.eval_loop(step_num)
         self.log.info("train down...")
         self.tensorboard_writer.close()
 
@@ -242,8 +242,8 @@ class TrainingSystem:
         self.log.info(f"val acc: {valid_acc}")
         self.log.info(f"val f1: {valid_f1}")
 
-        if valid_f1 < self.min_val_score and step != 0:
-            self.min_val_score = valid_f1
+        if valid_f1 > self.max_val_score and step != 0:
+            self.max_val_score = valid_f1
             is_save_model = True
 
         if not self.model_save_queue.full():
