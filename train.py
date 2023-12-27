@@ -86,10 +86,10 @@ class TrainingSystem:
         self.log.info("init data...")
         # 观测数据
         observe_data_conf = self.data_conf["observe_data"]
-        train_data_path = os.path.join(self.project_root, "dataset", "train_set.csv")
+        train_data_path = os.path.join(self.project_root, "dataset", "train_set.pkl")
 
         # test data
-        test_data_path = os.path.join(self.project_root, "dataset", "test_a.csv")
+        test_data_path = os.path.join(self.project_root, "dataset", "test_a.pkl")
 
         # eval data
         n_eval_sections = int(self.data_conf["observe_data"]["n_eval_sections"])
@@ -101,16 +101,16 @@ class TrainingSystem:
             val_type = "section"
 
         if val_type == "section":
-            observe_data = pd.read_csv(train_data_path, sep='\t')
-            test_data = pd.read_csv(test_data_path, sep='\t')
+            observe_data = pd.read_pickle(train_data_path, sep='\t')
+            test_data = pd.read_pickle(test_data_path, sep='\t')
             test_data['label'] = 0
             # random select
             train_data = observe_data.sample(frac=train_size, random_state=7)
             val_data = observe_data.drop(train_data.index).reset_index(drop=True)
             train_data = train_data.reset_index(drop=True)
         else:
-            observe_data = pd.read_csv(train_data_path, sep='\t')
-            test_data = pd.read_csv(test_data_path, sep='\t')
+            observe_data = pd.read_pickle(train_data_path, sep='\t')
+            test_data = pd.read_pickle(test_data_path, sep='\t')
             test_data['label'] = 0
             # random select
             train_data = observe_data.sample(frac=train_size, random_state=7)
