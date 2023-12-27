@@ -206,7 +206,7 @@ class TrainingSystem:
                 self.tensorboard_writer.add_scalar("Loss/train_Loss", loss.item(), step_num)
                 self.tensorboard_writer.add_scalar("Loss/train_acc", train_acc.item(), step_num)
                 self.tensorboard_writer.add_scalar("Loss/train_f1", train_f1, step_num)
-                self.tensorboard_writer.add_scalar("learning-rate", self.optim.param_groups[0]['lr'], step_num)
+                self.tensorboard_writer.add_scalar("lr/learning-rate", self.optim.param_groups[0]['lr'], step_num)
                 step_num += 1
             self.sch.step()
 
@@ -237,8 +237,8 @@ class TrainingSystem:
         valid_f1 = metrics.f1_score(y_true_, y_pred_, average='macro')
         acc_sum += sum(1 for y, t in zip(y_pred_, y_true_) if y == t)
         valid_acc = acc_sum / n
-        self.tensorboard_writer.add_scalar("Rmsd loss/val acc", valid_acc, step)
-        self.tensorboard_writer.add_scalar("Dis loss/valid f1", valid_f1, step)
+        self.tensorboard_writer.add_scalar("Val_loss/valid acc", valid_acc, step)
+        self.tensorboard_writer.add_scalar("Val_loss/valid f1", valid_f1, step)
         self.log.info(f"val step: {step}")
         self.log.info(f"val acc: {valid_acc}")
         self.log.info(f"val f1: {valid_f1}")
