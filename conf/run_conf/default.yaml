@@ -21,7 +21,7 @@ main_conf:
   run_mode: train
 train_conf:
   train_batch_size: 512
-  val_train_size: 1000
+  val_train_size: 512
   num_workers: 32
   epoch: 30
   eval_freq: 100
