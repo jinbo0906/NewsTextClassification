@@ -12,9 +12,9 @@
 # Training Tasks
 
 - [x] basic,num_workers=32：CUDA_VISIBLE_DEVICES=4 python train.py --config-name=Basic run_conf.train_conf.num_workers=32 hydra.job.chdir=True
-- basic: num_workers=32,dropout=0,lstm_layer_n=1
-- [ ] basic：CUDA_VISIBLE_DEVICES=3 python train.py --config-name=Basic hydra.job.chdir=True
-- [ ] basic,lstm_layer_n=2：CUDA_VISIBLE_DEVICES=4 python train.py --config-name=Basic model_conf.conf.bert.lstm_layer_n=2 hydra.job.chdir=True
+basic: num_workers=32,dropout=0,lstm_layer_n=1
+- [x] basic：CUDA_VISIBLE_DEVICES=3 python train.py --config-name=Basic hydra.job.chdir=True
+- [x] basic,lstm_layer_n=2：CUDA_VISIBLE_DEVICES=4 python train.py --config-name=Basic model_conf.conf.bert.lstm_layer_n=2 hydra.job.chdir=True
 
 
 # Results
