@@ -163,6 +163,9 @@ outputs/
 multirun/
 tensorboard_log/
 tensorboard/
-pretrained/
+pretrained/bert-base-cased
+pretrained/bert-base-chinese
+pretrained/bert-mini
+pretrained/bert-mini-my
 .ipynb_checkpoints/
 .pytest_cache/
